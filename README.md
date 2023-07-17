@@ -1,7 +1,11 @@
 # cfps-web
 
-[https://clown1331.github.io/cfps-web](https://clown1331.github.io/cfps-web)
+## Description
 
+A simple tool to randomly choose a unsolved problem in a given rating range from [codeforces](https://codeforces.com/problemset).
+
+## Usage
+[https://clown1331.github.io/cfps-web](https://clown1331.github.io/cfps-web)
 
 ## CLI
 
