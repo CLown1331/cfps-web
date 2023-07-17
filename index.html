@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<script>
+    async function process() {
+        if (!!document.body) {
+            document.body.innerHTML = 'loading...';
+        }
+        const q = new URLSearchParams(window.location.search);
+        const ratingLowerBound = q.get('l');
+        const ratingUpperBound = q.get('u');
+        const username = q.get('h');
+
+        if (!ratingLowerBound || !ratingUpperBound || !username) {
+            return;
+        }
+
+        const ratingLowerBoundInt = parseInt(ratingLowerBound);
+        const ratingUpperBoundInt = parseInt(ratingUpperBound);
+
+        if (isNaN(ratingLowerBoundInt) || isNaN(ratingUpperBoundInt)) {
+            return;
+        }
+
+        const response = await fetch(`https://codeforces.com/api/problemset.problems`);
+
+        if (!response.ok) {
+            return;
+        }
+
+        const data = await response.json();
+
+        if (data.status !== 'OK') {
+            return;
+        }
+
+        const problems = data.result.problems;
+
+        const filteredProblems = problems.filter(problem => {
+            const rating = problem.rating;
+
+            if (!rating) {
+                return false;
+            }
+
+            return rating >= ratingLowerBoundInt && rating <= ratingUpperBoundInt;
+        });
+
+        const problemIds = filteredProblems.map(problem => {
+            return {
+                contestId: problem.contestId,
+                index: problem.index
+            };
+        });
+
+        const userSolveResponse = await fetch(`https://codeforces.com/api/user.status?handle=${username}`);
+
+        if (!userSolveResponse.ok) {
+            return;
+        }
+
+        const userSolveData = await userSolveResponse.json();
+
+        if (userSolveData.status !== 'OK') {
+            return;
+        }
+
+        const userSubmissions = userSolveData.result;
+
+        const userSolveProblemIds = userSubmissions.map(submission => {
+            return {
+                contestId: submission.problem.contestId,
+                index: submission.problem.index
+            }
+        });
+
+        const unsolvedProblems = problemIds.filter(problemId => !userSolveProblemIds.includes(problemId));
+
+        const randomProblem = unsolvedProblems[Math.floor(Math.random() * unsolvedProblems.length)];
+
+        const problemUrl = `https://codeforces.com/problemset/problem/${randomProblem.contestId}/${randomProblem.index}`;
+
+        window.location = problemUrl;
+    }
+
+    async function go() {
+        const ratingLowerBound = document.getElementById('ratingLowerBound').value;
+        const ratingUpperBound = document.getElementById('ratingUpperBound').value;
+        const username = document.getElementById('username').value;
+        window.location = `/?l=${ratingLowerBound}&u=${ratingUpperBound}&h=${username}`;
+    }
+
+    process();
+</script>
+
+<body>
+    <input type="text" id="ratingLowerBound" placeholder="Rating Lower Bound">
+    <input type="text" id="ratingUpperBound" placeholder="Rating Upper Bound">
+    <input type="text" id="username" placeholder="Username">
+    <button onclick="go()">Go</button>
+</body>
+
+</html>
