@@ -86,7 +86,7 @@
         const ratingLowerBound = document.getElementById('ratingLowerBound').value;
         const ratingUpperBound = document.getElementById('ratingUpperBound').value;
         const username = document.getElementById('username').value;
-        window.location = `/?l=${ratingLowerBound}&u=${ratingUpperBound}&h=${username}`;
+        window.location = `${window.location}?l=${ratingLowerBound}&u=${ratingUpperBound}&h=${username}`;
     }
 
     process();
