@@ -76,8 +76,12 @@
                     index: submission.problem.index
                 }
             });
-
-            const unsolvedProblems = problemIds.filter(problemId => !userSolveProblemIds.includes(problemId));
+            
+            const unsolvedProblems = problemIds.filter(problemId => {
+                return userSolveProblemIds.some(userSolveProblemId => {
+                    return userSolveProblemId.contestId === problemId.contestId && userSolveProblemId.index === problemId.index;
+                }) === false;
+            });
 
             const randomProblem = unsolvedProblems[Math.floor(Math.random() * unsolvedProblems.length)];
 
